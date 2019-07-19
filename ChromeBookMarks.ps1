@@ -52,7 +52,10 @@ $formButton.Add_Click({
     $folderDialog.ShowDialog() | Out-Null
 
     Write-host $folderDialog.SelectedPath
+    $selectedPath = $folderDialog.SelectedPath
     foreach($cComp in $comps){
+        Write-Host "creating folder $cComp in $selectedPath"
+        New-item -Path $selectedPath -ItemType Directory -Name $cComp
         $folders = ""
         $folders = Invoke-Command -ComputerName $cComp -Credential $creds {Get-ChildItem -Path "C:\users\"}
         foreach($cfolder in $folders.name){
@@ -63,8 +66,8 @@ $formButton.Add_Click({
             $cBookmark = Invoke-Command -ComputerName $cComp -Credential $creds -ArgumentList $cPath {Get-Content -Path $args[0]}
             
             $filterBookmark = $cBookmark | findstr /C:"http"
-            $selectedPath = $folderDialog.SelectedPath
-            Add-Content "$selectedPath\$cfolder.txt" $filterBookmark
+            
+            Add-Content "$selectedPath\$cComp\$cfolder.txt" $filterBookmark.trim()
 
 
         }
